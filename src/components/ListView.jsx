@@ -28,6 +28,8 @@ import { useListEditor } from '../hooks/useListEditor.js';
 import { useUndoRedoShortcuts } from '../hooks/useUndoRedoShortcuts.js';
 import { useLists } from '../context/ListsContext.jsx';
 
+import ItemCard from '../components/ItemCard.jsx';
+
 export default function ListView() {
     const { list, canUndo, canRedo, undo, redo, closeList, moveItem, renameList } = useListEditor();
 
@@ -303,15 +305,24 @@ export default function ListView() {
                     onDragOver={handleDragOver}
                     onDrop={handleDrop}
                     className="card-container card-scroll m-0 min-h-0 flex-1 list-none
-                               overflow-x-hidden overflow-y-auto pt-0.5 pr-2 pb-22 pl-0.5">
-                    <li className={HARD_CODED_ROW}>
-                        <span className={HARD_CODED_DESCRIPTION}>Hard Coded Task 1 Description</span>
-                        <span className={HARD_CODED_DATE}>01/01/1970</span>
-                    </li>
-                    <li className={HARD_CODED_ROW}>
-                        <span className={HARD_CODED_DESCRIPTION}>Hard Coded Task 2 Description</span>
-                        <span className={HARD_CODED_DATE}>01/01/1970</span>
-                    </li>
+                            overflow-x-hidden overflow-y-auto pt-0.5 pr-2 pb-22 pl-0.5">
+                    
+                    {list.items.length === 0 ? (
+                        <li className="p-4 text-center text-grey-500 italic">
+                            This list is empty
+                        </li>
+                    ) : (
+                        list.items.map((item, index) => (
+                            <ItemCard
+                                key={item.id} // React requires a unique key when mapping arrays
+                                item={item}
+                                index={index}
+                                onEdit={() => requestEditItem(index)}
+                                onDelete={() => requestDeleteItem(index)}
+                                onDuplicate={() => duplicateItem(index)}
+                            />
+                        ))
+                    )}
                 </ol>
             </div>
         </section>
