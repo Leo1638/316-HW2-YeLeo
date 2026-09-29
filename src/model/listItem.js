@@ -20,6 +20,9 @@ export function createListItem(values = {}) {
         id: IdGenerator.next('item'),
         description: '',
         dateEntered: DateUtil.today(),
+        priority: 'Low',
+        targetDate: '',
+        completed: false,
         ...values
     };
 }
@@ -53,6 +56,9 @@ export function itemFromJSON(json) {
     return {
         id: json.id ?? IdGenerator.next('item'),
         description: String(json.description ?? ''),
-        dateEntered: DateUtil.clean(json.dateEntered) ?? DateUtil.today()
+        dateEntered: DateUtil.clean(json.dateEntered) ?? DateUtil.today(),
+        priority: json.priority ?? 'Low',
+        targetDate: json.targetDate ?? '',
+        completed: Boolean(json.completed ?? false)
     };
 }
