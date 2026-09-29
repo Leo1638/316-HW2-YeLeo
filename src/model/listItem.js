@@ -21,7 +21,7 @@ export function createListItem(values = {}) {
         description: '',
         dateEntered: DateUtil.today(),
         priority: 'Low',
-        targetDate: '',
+        targetDate: null,
         completed: false,
         ...values
     };
@@ -53,12 +53,14 @@ export function cloneItem(item) {
  * in: a missing id gets a new one and a malformed date is replaced with today.
  */
 export function itemFromJSON(json) {
+    const validPriorities = ['High', 'Medium', 'Low'];
+    const priority = validPriorities.includes(json.priority) ? json.priority : 'Low';
     return {
         id: json.id ?? IdGenerator.next('item'),
         description: String(json.description ?? ''),
         dateEntered: DateUtil.clean(json.dateEntered) ?? DateUtil.today(),
-        priority: json.priority ?? 'Low',
-        targetDate: json.targetDate ?? '',
+        priority: priority,
+        targetDate: json.targetDate ?? null,
         completed: Boolean(json.completed ?? false)
     };
 }

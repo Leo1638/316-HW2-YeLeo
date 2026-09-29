@@ -12,6 +12,7 @@
  */
 import { IdGenerator } from '../common/IdGenerator.js';
 import { itemFromJSON } from './listItem.js';
+import { cloneItem } from './listItem.js';
 
 export const DEFAULT_LIST_NAME = 'Untitled List';
 export const MAX_NAME_LENGTH = 60;
@@ -82,4 +83,13 @@ export function buildUnusedName(lists, desiredName) {
         name = `${desiredName} ${counter}`;
     }
     return name;
+}
+
+export function cloneList(list) {
+    return {
+        ...list,
+        id: IdGenerator.next('list'),
+        name: normalizeListName(`${list.name} (Copy)`),
+        items: list.items.map(cloneItem)
+    };
 }

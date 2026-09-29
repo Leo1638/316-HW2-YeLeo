@@ -5,11 +5,11 @@ export class AddItem_Transaction extends jsTPS_Transaction {
     #item;
     #index;
 
-    constructor(operations, item, index) {
+    constructor(operations, index, item) {
         super();
         this.#operations = operations;
-        this.#item = item;
         this.#index = index;
+        this.#item = item;
     }
 
     doTransaction() {

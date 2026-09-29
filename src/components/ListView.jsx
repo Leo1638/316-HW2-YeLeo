@@ -202,6 +202,7 @@ export default function ListView() {
                         rather than one of its own. Two ways out of a list, one
                         place for it to go wrong.
                     */}
+
                     <button
                         id="home-button" type="button" onClick={closeList}
                         title="Close this list and return to the home screen"
@@ -286,7 +287,8 @@ export default function ListView() {
                    second and every fixed width column is drawn half a pace to
                    the right of the values underneath it.
                 */}
-                <div className="item-column-headers item-grid gap-3 border-l-[0.3125rem]
+                {list.items.length > 0 && (
+                    <div className="item-column-headers item-grid gap-3 border-l-[0.3125rem]
                                 border-l-transparent pr-[1.375rem] pb-2 pl-[1rem]
                                 text-[0.6875rem] font-bold tracking-[0.09em] uppercase
                                 text-grey-500 max-[46rem]:hidden"
@@ -299,7 +301,7 @@ export default function ListView() {
                     <span className="area-completed text-center">Completed</span>
                     <span className="area-actions" />
                 </div>
-
+                )}
                 <ol
                     id="item-card-container"
                     ref={containerRef}
