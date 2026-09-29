@@ -13,6 +13,7 @@ import { normalizeListName } from '../model/wolfieList.js';
 import { DuplicateItem_Transaction } from '../transactions/DuplicateItem_Transaction.js';
 import { EditItem_Transaction } from '../transactions/EditItem_Transaction.js';
 import { DeleteItem_Transaction } from '../transactions/DeleteItem_Transaction.js';
+import { MoveItem_Transaction } from '../transactions/MoveItem_Transaction.js';
 
 export const ItemModalModes = {
     EDIT: 'edit'
@@ -82,13 +83,13 @@ export function useListEditor() {
 
     function moveItem(fromIndex, toIndex) {
         if (fromIndex === toIndex) return;
-        operations.moveItem(fromIndex, toIndex);
+        addTransaction(new MoveItem_Transaction(operations, fromIndex, toIndex));
     }
 
     function renameList(requestedName) {
         const newName = normalizeListName(requestedName);
         if (newName === list.name) return;
-        operations.setName(newName);
+        addTransaction(new RenameList_Transaction(operations, list.name, newName))
     }
 
     return {
