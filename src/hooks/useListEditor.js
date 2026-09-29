@@ -70,13 +70,12 @@ export function useListEditor() {
      * 'close' or 'next'
      */
     function commitItemModal({ index, values, then = 'close' }) {
-        // the alert opens on top of the item modal, so what was typed is kept
         if (values.description === '') {
             inform({ title: 'A Description Is Required', message: 'Every item needs a description.' });
             return;
         }
 
-        if (mode === 'create') {
+        if (index === list.items.length) {
             const newItem = createListItem(values);
             addTransaction(new AddItem_Transaction(operations, newItem, index));
         } else {
@@ -94,7 +93,6 @@ export function useListEditor() {
         }
     }
 
-    /** the copy is made here, once, so every redo puts back the same copy */
     function duplicateItem(index) {
         addTransaction(new DuplicateItem_Transaction(operations, index, cloneItem(list.items[index])));
     }
