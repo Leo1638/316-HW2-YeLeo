@@ -22,9 +22,10 @@
  * instead.
  */
 import { countCompleted } from '../model/wolfieList.js';
-import IconButton, { DELETE_GLYPH } from './IconButton.jsx';
+import IconButton, { DELETE_GLYPH, DUPLICATE_GLYPH } from './IconButton.jsx';
 
-export default function ListCard({ list, index, onOpen, onDelete }) {
+
+export default function ListCard({ list, index, onOpen, onDelete, onDuplicate }) {
     const total = list.items.length;
     const completed = countCompleted(list);
     const subtitle = (total === 0) ? 'No items yet' : `${completed} of ${total} completed`;
@@ -62,6 +63,11 @@ export default function ListCard({ list, index, onOpen, onDelete }) {
             </div>
 
             <div className="flex gap-1">
+                <IconButton
+                    action="duplicate-list"
+                    label={`Duplicate the list named ${list.name}`}
+                    glyph={DUPLICATE_GLYPH}
+                    onClick={onDuplicate} />
                 <IconButton
                     action="delete-list"
                     label={`Delete the list named ${list.name}`}

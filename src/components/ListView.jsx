@@ -27,11 +27,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useListEditor } from '../hooks/useListEditor.js';
 import { useUndoRedoShortcuts } from '../hooks/useUndoRedoShortcuts.js';
 import { useLists } from '../context/ListsContext.jsx';
+import Fab from './Fab.jsx';
 
 import ItemCard from '../components/ItemCard.jsx';
 
 export default function ListView() {
-    const { list, canUndo, canRedo, undo, redo, closeList, moveItem, renameList } = useListEditor();
+    const { 
+        list, canUndo, canRedo, undo, redo, closeList, moveItem, renameList, requestEditItem, requestDeleteItem, duplicateItem, requestAddItem } = useListEditor();
 
     const { listNeedingNameFocus, clearNameFocusRequest } = useLists();
 
@@ -312,18 +314,28 @@ export default function ListView() {
                             This list is empty
                         </li>
                     ) : (
-                        list.items.map((item, index) => (
-                            <ItemCard
-                                key={item.id} // React requires a unique key when mapping arrays
-                                item={item}
-                                index={index}
-                                onEdit={() => requestEditItem(index)}
-                                onDelete={() => requestDeleteItem(index)}
-                                onDuplicate={() => duplicateItem(index)}
-                            />
-                        ))
+                        list.items.map((item, index) => {
+                            let dropClass = '';
+                            if (dropIndicator.index === index) {
+                                dropClass = dropIndicator.edge === 'before' ? 'drop-before' : 'drop-after';
+                            }
+
+                            return (
+                                <ItemCard
+                                    key={item.id}
+                                    item={item}
+                                    index={index}
+                                    dropClass={dropClass}
+                                    onDragStart={(event) => handleDragStart(index, event)}
+                                    onEdit={() => requestEditItem(index)}
+                                    onDelete={() => requestDeleteItem(index)}
+                                    onDuplicate={() => duplicateItem(index)}
+                                />
+                            );
+                        })
                     )}
                 </ol>
+                <Fab id="add-item-button" label="Add a new item" onClick={requestAddItem} />
             </div>
         </section>
     );

@@ -12,10 +12,8 @@ import { cloneItem, itemValues, valuesAreEqual } from '../model/listItem.js';
 import { normalizeListName } from '../model/wolfieList.js';
 import { DuplicateItem_Transaction } from '../transactions/DuplicateItem_Transaction.js';
 import { EditItem_Transaction } from '../transactions/EditItem_Transaction.js';
-
 import { DeleteItem_Transaction } from '../transactions/DeleteItem_Transaction.js';
 
-/** what the item modal is currently being used for */
 export const ItemModalModes = {
     EDIT: 'edit'
 };
@@ -23,7 +21,7 @@ export const ItemModalModes = {
 export function useListEditor() {
     const { list, operations, addTransaction, undo, redo, canUndo, canRedo } = useCurrentList();
     const { closeList } = useLists();
-    const { openItemModal, closeItemModal, inform } = useModals();
+    const { openItemModal, closeItemModal, inform, askConfirm } = useModals();
 
     function requestEditItem(index) {
         openItemModal({
@@ -37,11 +35,11 @@ export function useListEditor() {
     function requestDeleteItem(index) {
         const itemToDelete = list.items[index];
 
-        ask({
+        askConfirm({
             title: 'Delete This Item?',
             message: 'Are you sure you want to delete this item? You can undo this.',
-            confirmText: 'Delete Item',
-            onConfirm: () => {
+            acceptLabel: 'Delete Item',
+            onAccept: () => {
                 addTransaction(new DeleteItem_Transaction(operations, index, itemToDelete));
             }
         });
@@ -69,7 +67,11 @@ export function useListEditor() {
         if (then === 'next') {
             requestEditItem(index + 1);
         } else {
-            closeItemModal();
+            if (then === 'previous') {
+                requestEditItem(index - 1);
+            } else {
+                closeItemModal();
+            }
         }
     }
 

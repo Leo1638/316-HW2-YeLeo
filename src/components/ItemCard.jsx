@@ -1,6 +1,6 @@
 import IconButton, { DELETE_GLYPH, DUPLICATE_GLYPH } from './IconButton.jsx';
 
-export default function ItemCard({ item, index, onEdit, onDelete, onDuplicate }) {
+export default function ItemCard({ item, index, dropClass = '', onEdit, onDelete, onDuplicate, onDragStart }) {
     const ariaLabel = `Edit the item ${item.description}${item.completed ? ', completed' : ''}`;
     const descriptionClass = `${HARD_CODED_DESCRIPTION} ${item.completed ? 'line-through text-grey-400' : ''}`;
 
@@ -12,11 +12,13 @@ export default function ItemCard({ item, index, onEdit, onDelete, onDuplicate })
 
     return (
         <li
-            className={ITEM_CARD_ROW} 
+            className={`${ITEM_CARD_ROW} ${dropClass}`} 
             data-index={index}
             role="button"
             tabIndex={0}
             aria-label={ariaLabel}
+            draggable={true}
+            onDragStart={onDragStart}
             onClick={onEdit}
             onKeyDown={handleKeyDown}>
             
@@ -47,19 +49,15 @@ export default function ItemCard({ item, index, onEdit, onDelete, onDuplicate })
                     action="duplicate-item"
                     label={`Duplicate the item ${item.description}`}
                     glyph={DUPLICATE_GLYPH}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onDuplicate(index);
-                    }} />
+                    onClick={onDuplicate} 
+                />
                 <IconButton
                     action="delete-item"
                     label={`Delete the item ${item.description}`}
                     glyph={DELETE_GLYPH}
                     danger
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete(index);
-                    }} />
+                    onClick={onDelete} 
+                />
             </div>
         </li>
     );
