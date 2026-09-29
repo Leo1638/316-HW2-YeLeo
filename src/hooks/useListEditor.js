@@ -14,6 +14,8 @@ import { DuplicateItem_Transaction } from '../transactions/DuplicateItem_Transac
 import { EditItem_Transaction } from '../transactions/EditItem_Transaction.js';
 import { DeleteItem_Transaction } from '../transactions/DeleteItem_Transaction.js';
 import { MoveItem_Transaction } from '../transactions/MoveItem_Transaction.js';
+import { AddItem_Transaction } from '../transactions/AddItem_Transaction.js';
+import { createListItem } from '../model/listItem.js';
 
 export const ItemModalModes = {
     EDIT: 'edit'
@@ -46,6 +48,20 @@ export function useListEditor() {
         });
     }
 
+    function requestAddItem() {
+        openItemModal({
+            mode: 'create',
+            index: list.items.length,
+            itemCount: list.items.length,
+            values: { 
+                description: '', 
+                priority: 'Low', 
+                targetDate: '', 
+                completed: false 
+            }
+        });
+    }
+
     /**
      * OK or Next in the item modal. Records the edit, or does nothing if
      * nothing changed.
@@ -60,19 +76,21 @@ export function useListEditor() {
             return;
         }
 
-        const oldValues = itemValues(list.items[index]);
-        if (!valuesAreEqual(oldValues, values)) {
-            addTransaction(new EditItem_Transaction(operations, index, oldValues, values));
+        if (mode === 'create') {
+            const newItem = createListItem(values);
+            addTransaction(new AddItem_Transaction(operations, newItem, index));
+        } else {
+            const oldValues = itemValues(list.items[index]);
+            if (!valuesAreEqual(oldValues, values)) {
+                addTransaction(new EditItem_Transaction(operations, index, oldValues, values));
+            }
         }
-
         if (then === 'next') {
             requestEditItem(index + 1);
+        } else if (then === 'previous') {
+            requestEditItem(index - 1);
         } else {
-            if (then === 'previous') {
-                requestEditItem(index - 1);
-            } else {
-                closeItemModal();
-            }
+            closeItemModal();
         }
     }
 
@@ -102,6 +120,7 @@ export function useListEditor() {
         closeList,
         requestDeleteItem,
         requestEditItem,
+        requestAddItem,
         commitItemModal,
         duplicateItem,
         moveItem,
