@@ -100,6 +100,7 @@ export default function ListView() {
             return;
         }
         renameList(event.target.value);
+        event.target.value = list.name;
     }
 
     function handleNameKeyDown(event) {

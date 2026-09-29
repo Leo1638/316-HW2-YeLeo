@@ -2,8 +2,8 @@ import { jsTPS_Transaction } from '../lib/jsTPS.js';
 
 export class AddItem_Transaction extends jsTPS_Transaction {
     #operations;
-    #item;
     #index;
+    #item;
 
     constructor(operations, index, item) {
         super();

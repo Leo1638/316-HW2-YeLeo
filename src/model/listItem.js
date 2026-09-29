@@ -60,7 +60,7 @@ export function itemFromJSON(json) {
         description: String(json.description ?? ''),
         dateEntered: DateUtil.clean(json.dateEntered) ?? DateUtil.today(),
         priority: priority,
-        targetDate: json.targetDate ?? null,
-        completed: Boolean(json.completed ?? false)
+        targetDate: DateUtil.clean(json.targetDate) ?? null,
+        completed: json.completed === true
     };
 }

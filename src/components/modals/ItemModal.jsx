@@ -105,7 +105,7 @@ export default function ItemModal() {
             initialFocusRef={descriptionRef}>
 
             <ModalHeading id="item-modal-heading">
-                {`Item ${itemModal.index + 1} of ${itemModal.itemCount}`}
+                {isCreate ? 'New Item' : `Item ${itemModal.index + 1} of ${itemModal.itemCount}`}
             </ModalHeading>
 
             <form id="item-modal-form" autoComplete="off"

@@ -1,5 +1,20 @@
 import IconButton, { DELETE_GLYPH, DUPLICATE_GLYPH } from './IconButton.jsx';
 
+const ITEM_CARD_ROW =
+    'item-grid mt-2.5 items-center gap-3 rounded-card border-l-[0.3125rem] ' +
+    'border-l-grey-300 bg-sbu-white px-[0.875rem] py-2.5 shadow-card first:mt-0 ' +
+    'group cursor-pointer hover:-translate-y-px hover:shadow-card-hover';
+
+const HARD_CODED_DESCRIPTION = 'area-description min-w-0 truncate font-semibold';
+const HARD_CODED_DATE = 'area-entered text-center text-[0.875rem] tabular-nums text-grey-700';
+
+function formatDisplayDate(isoString) {
+    if (!isoString) return '—';
+    const parts = isoString.split('-');
+    if (parts.length !== 3) return isoString;
+    return `${parts[1]}/${parts[2]}/${parts[0]}`;
+}
+
 export default function ItemCard({ item, index, dropClass = '', onEdit, onDelete, onDuplicate, onDragStart }) {
     const ariaLabel = `Edit the item ${item.description}${item.completed ? ', completed' : ''}`;
     const descriptionClass = `${HARD_CODED_DESCRIPTION} ${item.completed ? 'line-through text-grey-400' : ''}`;
@@ -12,7 +27,7 @@ export default function ItemCard({ item, index, dropClass = '', onEdit, onDelete
 
     return (
         <li
-            className={`${ITEM_CARD_ROW} ${dropClass}`} 
+            className={`item-card ${ITEM_CARD_ROW} ${dropClass}`}
             data-index={index}
             role="button"
             tabIndex={0}
@@ -23,13 +38,13 @@ export default function ItemCard({ item, index, dropClass = '', onEdit, onDelete
             onKeyDown={handleKeyDown}>
             
             <span className="area-handle text-grey-300 text-center font-bold">⋮⋮</span>
-
-            <span className={descriptionClass}>
+            
+            <span className={`item-description ${descriptionClass}`}>
                 {item.description}
             </span>
-
+            
             <span className={HARD_CODED_DATE}>
-                {item.dateEntered}
+                {formatDisplayDate(item.dateEntered)}
             </span>
 
             <span className="area-priority text-center text-[0.875rem] font-bold">
@@ -37,7 +52,7 @@ export default function ItemCard({ item, index, dropClass = '', onEdit, onDelete
             </span>
 
             <span className="area-target text-center text-[0.875rem] tabular-nums text-grey-700">
-                {item.targetDate ? item.targetDate : '—'}
+                {formatDisplayDate(item.targetDate)}
             </span>
 
             <span className="area-completed text-center text-[1.25rem] font-bold text-completed-mark">
@@ -49,25 +64,14 @@ export default function ItemCard({ item, index, dropClass = '', onEdit, onDelete
                     action="duplicate-item"
                     label={`Duplicate the item ${item.description}`}
                     glyph={DUPLICATE_GLYPH}
-                    onClick={onDuplicate} 
-                />
+                    onClick={(e) => { e.stopPropagation(); onDuplicate(); }} />
                 <IconButton
                     action="delete-item"
                     label={`Delete the item ${item.description}`}
                     glyph={DELETE_GLYPH}
                     danger
-                    onClick={onDelete} 
-                />
+                    onClick={(e) => { e.stopPropagation(); onDelete(); }} />
             </div>
         </li>
     );
 }
-
-const ITEM_CARD_ROW =
-    'item-grid mt-2.5 items-center gap-3 rounded-card border-l-[0.3125rem] ' +
-    'border-l-grey-300 bg-sbu-white px-[0.875rem] py-2.5 shadow-card first:mt-0 ' +
-    'group cursor-pointer hover:-translate-y-px hover:shadow-card-hover';
-
-const HARD_CODED_DESCRIPTION = 'area-description min-w-0 truncate font-semibold';
-
-const HARD_CODED_DATE = 'area-entered text-center text-[0.875rem] tabular-nums text-grey-700';

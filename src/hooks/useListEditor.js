@@ -1,24 +1,18 @@
-/**
- * useListEditor.js
- *
- * Everything the list screen can do, as one hook. A component calls
- * duplicateItem(index) and never has to know about the contexts, the
- * transaction stack or the model behind it.
- */
 import { useCurrentList } from '../context/CurrentListContext.jsx';
 import { useLists } from '../context/ListsContext.jsx';
 import { useModals } from '../context/ModalContext.jsx';
-import { cloneItem, itemValues, valuesAreEqual } from '../model/listItem.js';
+import { cloneItem, itemValues, valuesAreEqual, createListItem } from '../model/listItem.js';
 import { normalizeListName } from '../model/wolfieList.js';
 import { DuplicateItem_Transaction } from '../transactions/DuplicateItem_Transaction.js';
 import { EditItem_Transaction } from '../transactions/EditItem_Transaction.js';
 import { DeleteItem_Transaction } from '../transactions/DeleteItem_Transaction.js';
 import { MoveItem_Transaction } from '../transactions/MoveItem_Transaction.js';
 import { AddItem_Transaction } from '../transactions/AddItem_Transaction.js';
-import { createListItem } from '../model/listItem.js';
+import { RenameList_Transaction } from '../transactions/RenameList_Transaction.js';
 
 export const ItemModalModes = {
-    EDIT: 'edit'
+    EDIT: 'edit',
+    CREATE: 'create'
 };
 
 export function useListEditor() {
@@ -37,7 +31,6 @@ export function useListEditor() {
 
     function requestDeleteItem(index) {
         const itemToDelete = list.items[index];
-
         askConfirm({
             title: 'Delete This Item?',
             message: 'Are you sure you want to delete this item? You can undo this.',
@@ -50,25 +43,17 @@ export function useListEditor() {
 
     function requestAddItem() {
         openItemModal({
-            mode: 'create',
+            mode: ItemModalModes.CREATE,
             index: list.items.length,
             itemCount: list.items.length,
             values: { 
                 description: '', 
                 priority: 'Low', 
-                targetDate: '', 
-                completed: false 
-            }
+                targetDate: null, 
+                completed: false }
         });
     }
 
-    /**
-     * OK or Next in the item modal. Records the edit, or does nothing if
-     * nothing changed.
-     *
-     * @param {Object} request { mode, index, values, then } where then is
-     * 'close' or 'next'
-     */
     function commitItemModal({ index, values, then = 'close' }) {
         if (values.description === '') {
             inform({ title: 'A Description Is Required', message: 'Every item needs a description.' });
@@ -77,20 +62,17 @@ export function useListEditor() {
 
         if (index === list.items.length) {
             const newItem = createListItem(values);
-            addTransaction(new AddItem_Transaction(operations, newItem, index));
+            addTransaction(new AddItem_Transaction(operations, newItem, index)); 
         } else {
             const oldValues = itemValues(list.items[index]);
             if (!valuesAreEqual(oldValues, values)) {
                 addTransaction(new EditItem_Transaction(operations, index, oldValues, values));
             }
         }
-        if (then === 'next') {
-            requestEditItem(index + 1);
-        } else if (then === 'previous') {
-            requestEditItem(index - 1);
-        } else {
-            closeItemModal();
-        }
+
+        if (then === 'next') requestEditItem(index + 1);
+        else if (then === 'previous') requestEditItem(index - 1);
+        else closeItemModal();
     }
 
     function duplicateItem(index) {
@@ -102,26 +84,15 @@ export function useListEditor() {
         addTransaction(new MoveItem_Transaction(operations, fromIndex, toIndex));
     }
 
-    function renameList(requestedName) {
-        const newName = normalizeListName(requestedName);
-        if (newName === list.name) return;
-        addTransaction(new RenameList_Transaction(operations, list.name, newName))
+    function renameList(newName) {
+        const normalized = normalizeListName(newName);
+        if (normalized !== list.name) {
+            addTransaction(new RenameList_Transaction(operations, list.name, normalized));
+        }
     }
 
     return {
-        list,
-        items: list?.items ?? [],
-        canUndo,
-        canRedo,
-        undo,
-        redo,
-        closeList,
-        requestDeleteItem,
-        requestEditItem,
-        requestAddItem,
-        commitItemModal,
-        duplicateItem,
-        moveItem,
-        renameList
+        list, items: list?.items ?? [], canUndo, canRedo, undo, redo, closeList, 
+        requestDeleteItem, requestEditItem, requestAddItem, commitItemModal, duplicateItem, moveItem, renameList
     };
 }
